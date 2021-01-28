@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "CapidaDAOTransport"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3"
+s3_prefix = "CapidaDAOTransport"
+region = "eu-west-1"
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "ContextId=\"571\" ClientId=\"ThetisClientId\" ClientSecret=\"ThetisClientSecret\" ApiKey=\"d05f0efb-e8be-4912-bc5f-ef325bb17a01\""
