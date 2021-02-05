@@ -195,7 +195,9 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 		params.kundeid = setup.customerId;
 		params.kode = setup.code;
 		params.afsenderid = setup.senderId;
-		params.shopid = shipment.pickUpPointId;
+		if (shipment.deliverToPickUpPoint) {
+			params.shopid = shipment.pickUpPointId;
+		}
 		params.postnr = deliveryAddress.postalCode;
 		params.adresse = deliveryAddress.streetNameAndNumber;
 		params.navn = deliveryAddress.addressee;
