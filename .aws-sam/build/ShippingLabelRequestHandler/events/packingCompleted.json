@@ -13,7 +13,7 @@
         "carrierName": "DAO",
         "shipmentId": 33010792,
         "contextId": "550",
-        "eventType": "shippingLabelRequest",
+        "eventType": "packingCompleted",
         "carrierId": 28256060,
         "userId": 3186879
     }
