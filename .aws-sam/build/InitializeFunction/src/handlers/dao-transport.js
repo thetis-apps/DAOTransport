@@ -254,7 +254,9 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			message.time = Date.now();
 			message.source = "DAOTransport";
 			message.messageType = "INFO";
-			message.messageText = "Labels are ready";
+			message.messageText = "Labels are ready";		
+			message.deviceName = detail.deviceName;
+			message.userId = detail.userId;
 			await ims.post("events/" + detail.eventId + "/messages", message);
 
 		} else {
@@ -262,6 +264,8 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			var message = new Object
 			message.time = Date.now();
 			message.source = "DAOTransport";
+			message.deviceName = detail.deviceName;
+			message.userId = detail.userId;
 			message.messageType = "ERROR";
 			message.messageText = response.data.fejltekst;
 			await ims.post("events/" + detail.eventId + "/messages", message);

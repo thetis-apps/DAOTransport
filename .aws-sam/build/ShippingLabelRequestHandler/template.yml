@@ -23,7 +23,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['thetis-ims']
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 0.0.1
+    SemanticVersion: 0.1.0
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
     
 # Parameters of the application 
