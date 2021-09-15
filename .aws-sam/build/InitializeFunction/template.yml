@@ -23,7 +23,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['thetis-ims']
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 0.1.0
+    SemanticVersion: 0.1.1
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
     
 # Parameters of the application 
@@ -46,7 +46,7 @@ Parameters:
 Resources:  
 
   # Function that will run when a shipping label is requested by Thetis IMS
-  ShippingLabelRequestHandler:
+  PackingCompletedHandler:
     Type: AWS::Serverless::Function
     Properties:
       Description: Function that runs when a shipping label is requested by Thetis IMS

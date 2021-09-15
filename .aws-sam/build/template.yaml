@@ -14,7 +14,7 @@ Metadata:
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: '0.1.0'
+    SemanticVersion: '0.1.1'
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
 Parameters:
   ContextId:
@@ -30,7 +30,7 @@ Parameters:
   ApiKey:
     Type: String
 Resources:
-  ShippingLabelRequestHandler:
+  PackingCompletedHandler:
     Type: AWS::Serverless::Function
     Properties:
       Description: Function that runs when a shipping label is requested by Thetis
@@ -67,7 +67,7 @@ Resources:
           Fn::GetAtt:
           - DeadLetterQueue
           - Arn
-      CodeUri: ShippingLabelRequestHandler
+      CodeUri: PackingCompletedHandler
   InitResource:
     Type: AWS::CloudFormation::CustomResource
     Properties:

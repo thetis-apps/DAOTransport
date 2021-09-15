@@ -6,6 +6,6 @@ codeuri = "."
 runtime = "nodejs12.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["ShippingLabelRequestHandler", "InitializeFunction"]
+functions = ["PackingCompletedHandler", "InitializeFunction"]
 
 [layer_build_definitions]

@@ -218,7 +218,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 		params.idkrav = "Udleveringskode";
 		params.faktura = shipment.shipmentNumber;
 		params.afsenderid = setup.senderId;
-		params.test = false;
+		params.test = 1;
 		params.format = "JSON";
 		
 		if (deliveryAddress.countryCode == "DK") {
@@ -234,7 +234,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			
 			let trackingNumber = response.data.resultat.stregkode;
 	
-			response = await ims.put("shippingContainers/" + shippingContainer.id, "trackingNumber", trackingNumber);
+			response = await ims.put("shippingContainers/" + shippingContainer.id + "/trackingNumber", trackingNumber);
 			shippingContainer = response.data;
 			
 			params = new Object();
@@ -243,10 +243,11 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			params.stregkode = trackingNumber;
 			params.papir = "100x150";
 			params.format = "JSON";
-			response = await dao.get("HentLabel.php");
-			
+			response = await dao.get("HentLabel.php", { params: params });
+			let pdf = new Buffer.from(response.data);
+
 			var shippingLabel = new Object();
-			shippingLabel.base64EncodedContent = response.data;
+			shippingLabel.base64EncodedContent = pdf.toString('base64');
 			shippingLabel.fileName = "SHIPPING_LABEL_" + shipment.id + "_" + i + ".pdf";
 			await ims.post("shipments/"+ shipmentId + "/attachments", shippingLabel);
 
@@ -258,7 +259,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			message.deviceName = detail.deviceName;
 			message.userId = detail.userId;
 			await ims.post("events/" + detail.eventId + "/messages", message);
-
+				
 		} else {
 			
 			var message = new Object
@@ -267,7 +268,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			message.deviceName = detail.deviceName;
 			message.userId = detail.userId;
 			message.messageType = "ERROR";
-			message.messageText = response.data.fejltekst;
+			message.messageText = "Failed to register shipment with DAO. DAO says: " + response.data.fejltekst;
 			await ims.post("events/" + detail.eventId + "/messages", message);
 			
 		}
