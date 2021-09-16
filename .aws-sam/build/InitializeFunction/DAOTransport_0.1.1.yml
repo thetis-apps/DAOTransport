@@ -9,12 +9,12 @@ Metadata:
       DAO.
     Author: thetis-apps
     SpdxLicenseId: Apache-2.0
-    LicenseUrl: ../../LICENSE.txt
-    ReadmeUrl: ../../README.md
+    LicenseUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/4612b8d5aa75b9b9936c9b7b9e6c7e82
+    ReadmeUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/a4f46a5a5e99d257655f1a299ecd5680
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: '0.2.0'
+    SemanticVersion: '0.1.1'
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
 Parameters:
   ContextId:
@@ -67,7 +67,7 @@ Resources:
           Fn::GetAtt:
           - DeadLetterQueue
           - Arn
-      CodeUri: PackingCompletedHandler
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/f5f937be6e96c33ea244054155908e94
   InitResource:
     Type: AWS::CloudFormation::CustomResource
     Properties:
@@ -92,7 +92,7 @@ Resources:
             Ref: ClientSecret
           ApiKey:
             Ref: ApiKey
-      CodeUri: InitializeFunction
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/f5f937be6e96c33ea244054155908e94
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties: {}
