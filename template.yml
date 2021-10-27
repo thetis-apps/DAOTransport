@@ -23,7 +23,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['thetis-ims']
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 0.2.0
+    SemanticVersion: 1.1.0
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
     
 # Parameters of the application 
@@ -40,6 +40,10 @@ Parameters:
     Default: ThetisClientSecret
   ApiKey:
     Type: String
+  DevOpsEmail:
+    Description: The email address to send mail to when messages in the dead letter queue.
+    Type: String
+    MinLength: 4
 
 # Resources declares the AWS resources that you want to include in the stack
 # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/resources-section-structure.html
@@ -138,6 +142,7 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       Subscription:
-      - Endpoint: devops@thetis-apps.com
+      - Endpoint: 
+          Ref: DevOpsEmail        
         Protocol: email
       DisplayName: Incidents to be handled by Thetis Devops.

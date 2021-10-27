@@ -88,7 +88,11 @@ async function getDAO() {
 	});
 	
 	dao.interceptors.response.use(function(response) {
-			console.log("SUCCESS " + JSON.stringify(response.data));
+			if (response.headers['content-type'] == "application/json") {
+				console.log("SUCCESS " + JSON.stringify(response.data));
+			} else {
+				console.log("SUCCESS " + response.headers['content-type']);
+			}
  	    	return response;
 		}, function (error) {
 			if (error.response) {
@@ -144,7 +148,7 @@ exports.initializer = async (input, context) => {
 		await sendResponse(input, context, "SUCCESS", JSON.stringify(error));
 	}
 
-}
+};
 
 
 /**
@@ -156,7 +160,6 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 
     var detail = event.detail;
     var shipmentId = detail.shipmentId;
-    var contextId = detail.contextId;
 
 	let ims = await getIMS();
 	
@@ -172,8 +175,8 @@ exports.shippingLabelRequestHandler = async (event, context) => {
     response = await ims.get("shipments/" + shipmentId);
     var shipment = response.data;
     
-	var parcels = [];
 	var shippingContainers = [];
+	let countryCode = shipment.deliveryAddress.countryCode;
 	shippingContainers = shipment.shippingContainers;
 	for (let i = 0; i < shippingContainers.length; i++) {
 		
@@ -182,13 +185,15 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 		let params = new Object();
 
 		let uri;
-		if (shipment.countryCountry != 'DK') {
+		if (countryCode != 'DK') {
 			uri = "DAODirekte/UdlandLeveringsOrdre.php";
 		} else if (shipment.deliverToPickUpPoint) {
 			uri = "DAOPakkeshop/leveringsordre.php";
 		} else {
 			uri = "DAODirekte/leveringsordre.php";
 		}
+		
+		console.log("Calling DAO at " + uri);
 
 		let deliveryAddress = shipment.deliveryAddress;
 		let contactPerson = shipment.contactPerson;
@@ -221,9 +226,9 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 		params.test = setup.test ? 1 : 0;
 		params.format = "JSON";
 		
-		if (deliveryAddress.countryCode == "DK") {
+		if (deliveryAddress.countryCode != 'DK') {
 			params.by = deliveryAddress.cityTownOrVillage;
-			params.land = deliveryAddress.countryCode;
+			params.land = countryCode;
 			params.reference = shipment.shipmentNumber;
 		}
 
@@ -237,24 +242,24 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			response = await ims.put("shippingContainers/" + shippingContainer.id + "/trackingNumber", trackingNumber);
 			shippingContainer = response.data;
 			
+			await ims.patch("shipments/" + shipmentId, { carriersShipmentNumber: trackingNumber });
+
 			params = new Object();
 			params.kundeid = setup.customerId;
 			params.kode = setup.code;
 			params.stregkode = trackingNumber;
 			params.papir = setup.paper;
 			params.format = "JSON";
-			response = await dao.get("HentLabel.php", { params: params });
+			response = await dao.get("HentLabel.php", { params: params, responseType: 'arraybuffer' });
 			
 			if (response.headers['content-type'] == "application/pdf") {
 			
-				let pdf = new Buffer.from(response.data);
-	
-				var shippingLabel = new Object();
-				shippingLabel.base64EncodedContent = pdf.toString('base64');
+				let shippingLabel = new Object();
+				shippingLabel.base64EncodedContent = response.data.toString('base64');
 				shippingLabel.fileName = "SHIPPING_LABEL_" + shippingContainer.id + ".pdf";
 				await ims.post("shipments/"+ shipmentId + "/attachments", shippingLabel);
 	
-				var message = new Object
+				let message = new Object();
 				message.time = Date.now();
 				message.source = "DAOTransport";
 				message.messageType = "INFO";
@@ -265,7 +270,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 				
 			} else {
 				
-				let message = new Object
+				let message = new Object();
 				message.time = Date.now();
 				message.source = "DAOTransport";
 				message.deviceName = detail.deviceName;
@@ -278,7 +283,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 			
 		} else {
 			
-			var message = new Object
+			let message = new Object();
 			message.time = Date.now();
 			message.source = "DAOTransport";
 			message.deviceName = detail.deviceName;
@@ -292,4 +297,4 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 
 	return "done";
 
-}
+};
