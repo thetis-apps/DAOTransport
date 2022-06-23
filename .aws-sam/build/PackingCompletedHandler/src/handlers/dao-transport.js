@@ -150,19 +150,10 @@ exports.initializer = async (input, context) => {
 
 };
 
-
-/**
- * A Lambda function that get shipping labels for parcels from GLS.
- */
-exports.shippingLabelRequestHandler = async (event, context) => {
+async function book(ims, detail) {
 	
-    console.info(JSON.stringify(event));
+	    var shipmentId = detail.shipmentId;
 
-    var detail = event.detail;
-    var shipmentId = detail.shipmentId;
-
-	let ims = await getIMS();
-	
 	let dao = await getDAO(ims, detail.eventId);
 
     let response = await ims.get("carriers");
@@ -175,6 +166,7 @@ exports.shippingLabelRequestHandler = async (event, context) => {
     response = await ims.get("shipments/" + shipmentId);
     var shipment = response.data;
     
+    let labels = [];
 	var shippingContainers = [];
 	let countryCode = shipment.deliveryAddress.countryCode;
 	shippingContainers = shipment.shippingContainers;
@@ -257,17 +249,8 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 				let shippingLabel = new Object();
 				shippingLabel.base64EncodedContent = response.data.toString('base64');
 				shippingLabel.fileName = "SHIPPING_LABEL_" + shippingContainer.id + ".pdf";
-				await ims.post("shipments/"+ shipmentId + "/attachments", shippingLabel);
+				labels.push(shippingLabel);
 	
-				let message = new Object();
-				message.time = Date.now();
-				message.source = "DAOTransport";
-				message.messageType = "INFO";
-				message.messageText = "Labels are ready";		
-				message.deviceName = detail.deviceName;
-				message.userId = detail.userId;
-				await ims.post("events/" + detail.eventId + "/messages", message);
-				
 			} else {
 				
 				let message = new Object();
@@ -295,6 +278,63 @@ exports.shippingLabelRequestHandler = async (event, context) => {
 		}
 	}
 
+	return labels;
+}
+
+/**
+ * A Lambda function that get shipping labels for parcels from GLS.
+ */
+exports.shippingLabelRequestHandler = async (event, context) => {
+	
+    console.info(JSON.stringify(event));
+
+    var detail = event.detail;
+	let ims = await getIMS();
+
+	let labels = await book(ims, detail);
+	
+	if (labels.length > 0) { 
+		
+		for (let label of labels) {
+			await ims.post("shipments/"+ detail.shipmentId + "/attachments", label);
+		}
+
+		let message = new Object();
+		message.time = Date.now();
+		message.source = "DAOTransport";
+		message.messageType = "INFO";
+		message.messageText = "Labels are ready";		
+		message.deviceName = detail.deviceName;
+		message.userId = detail.userId;
+		await ims.post("events/" + detail.eventId + "/messages", message);
+
+	}				
+
 	return "done";
 
+};
+
+exports.bookingHandler = async (event, context) => {
+
+    console.info(JSON.stringify(event));
+
+    var detail = event.detail;
+
+	let ims = await getIMS();
+
+	await ims.patch('/documents/' + detail.documentId, { workStatus: 'ON_GOING' });
+	
+    let labels = await book(ims, detail);
+    
+	if (labels.length > 0) {
+		for (let label of labels) {
+			await ims.post('/documents/' + detail.documentId + '/attachments', label);
+		}
+		await ims.patch('/documents/' + detail.documentId, { workStatus: 'DONE' });
+    } else {
+		await ims.patch('/documents/' + detail.documentId, { workStatus: 'FAILED' });
+    }
+    
+	return "done";
+	
 };

@@ -14,7 +14,7 @@ Metadata:
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 1.1.0
+    SemanticVersion: 2.0.0
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
 Parameters:
   ContextId:
@@ -73,6 +73,46 @@ Resources:
           - DeadLetterQueue
           - Arn
       CodeUri: PackingCompletedHandler
+  BookingHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Function that runs when a transport booking is created in Thetis
+        IMS
+      Runtime: nodejs12.x
+      Handler: src/handlers/dao-transport.bookingHandler
+      Environment:
+        Variables:
+          ClientId:
+            Ref: ClientId
+          ClientSecret:
+            Ref: ClientSecret
+          ApiKey:
+            Ref: ApiKey
+      Events:
+        Request:
+          Type: EventBridgeRule
+          Properties:
+            Pattern:
+              source:
+              - public.thetis-ims.com
+              detail-type:
+              - documentCreated
+              detail:
+                documentType:
+                - TRANSPORT_BOOKING
+                carrierName:
+                - DAO
+                contextId:
+                - Ref: ContextId
+      MemorySize: 128
+      Timeout: 100
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn:
+          Fn::GetAtt:
+          - DeadLetterQueue
+          - Arn
+      CodeUri: BookingHandler
   InitResource:
     Type: AWS::CloudFormation::CustomResource
     Properties:
