@@ -23,7 +23,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['thetis-ims']
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 2.0.0
+    SemanticVersion: 2.0.1
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
     
 # Parameters of the application 
@@ -155,7 +155,8 @@ Resources:
   # Our standard monitoring setup      
   DeadLetterQueue:
     Type: AWS::SQS::Queue
-    Properties: {}
+    Properties: 
+      KmsMasterKeyId: alias/aws/sqs
   Alarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -180,6 +181,7 @@ Resources:
   IncidentTopic:
     Type: AWS::SNS::Topic
     Properties:
+      KmsMasterKeyId: alias/aws/sns
       Subscription:
       - Endpoint: 
           Ref: DevOpsEmail        
