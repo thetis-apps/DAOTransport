@@ -231,7 +231,7 @@ async function book(ims, detail) {
 			
 			let trackingNumber = response.data.resultat.stregkode;
 	
-			response = await ims.put("shippingContainers/" + shippingContainer.id + "/trackingNumber", trackingNumber);
+			response = await ims.patch("shippingContainers/" + shippingContainer.id,  { trackingNumber: trackingNumber });
 			shippingContainer = response.data;
 			
 			await ims.patch("shipments/" + shipmentId, { carriersShipmentNumber: trackingNumber });
