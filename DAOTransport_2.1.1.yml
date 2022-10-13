@@ -9,8 +9,8 @@ Metadata:
       DAO.
     Author: thetis-apps
     SpdxLicenseId: Apache-2.0
-    LicenseUrl: ../../LICENSE.txt
-    ReadmeUrl: ../../README.md
+    LicenseUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/4612b8d5aa75b9b9936c9b7b9e6c7e82
+    ReadmeUrl: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/226d515c9479ce5a51562e5f04b4e590
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
@@ -76,7 +76,7 @@ Resources:
           Fn::GetAtt:
           - DeadLetterQueue
           - Arn
-      CodeUri: BookingHandler
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/6498a570210b2f178db50916879a3589
     Metadata:
       SamResourceId: BookingHandler
   InitResource:
@@ -87,6 +87,8 @@ Resources:
         - InitializeFunction
         - Arn
       Version: 1
+    Metadata:
+      SamResourceId: InitResource
   InitializeFunction:
     Type: AWS::Serverless::Function
     DeletionPolicy: Delete
@@ -102,13 +104,15 @@ Resources:
             Ref: ClientSecret
           ApiKey:
             Ref: ApiKey
-      CodeUri: InitializeFunction
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/6498a570210b2f178db50916879a3589
     Metadata:
       SamResourceId: InitializeFunction
   DeadLetterQueue:
     Type: AWS::SQS::Queue
     Properties:
       KmsMasterKeyId: alias/aws/sqs
+    Metadata:
+      SamResourceId: DeadLetterQueue
   Alarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -130,6 +134,8 @@ Resources:
           - QueueName
       TreatMissingData: notBreaching
       Statistic: Maximum
+    Metadata:
+      SamResourceId: Alarm
   IncidentTopic:
     Type: AWS::SNS::Topic
     Properties:
@@ -139,3 +145,5 @@ Resources:
           Ref: DevOpsEmail
         Protocol: email
       DisplayName: Incidents to be handled by Thetis Devops.
+    Metadata:
+      SamResourceId: IncidentTopic
