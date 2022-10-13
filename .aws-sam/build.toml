@@ -8,6 +8,15 @@ architecture = "x86_64"
 handler = "src/handlers/dao-transport.shippingLabelRequestHandler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["PackingCompletedHandler", "BookingHandler", "InitializeFunction"]
+functions = ["InitializeFunction"]
+
+[function_build_definitions.506f16af-8378-458c-8abc-4b15d38bc7ce]
+codeuri = "/home/ec2-user/environment/DAOTransport"
+runtime = "nodejs16.x"
+architecture = "x86_64"
+handler = "src/handlers/dao-transport.bookingHandler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["BookingHandler"]
 
 [layer_build_definitions]

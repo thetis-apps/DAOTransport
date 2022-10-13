@@ -281,39 +281,6 @@ async function book(ims, detail) {
 	return labels;
 }
 
-/**
- * A Lambda function that get shipping labels for parcels from GLS.
- */
-exports.shippingLabelRequestHandler = async (event, context) => {
-	
-    console.info(JSON.stringify(event));
-
-    var detail = event.detail;
-	let ims = await getIMS();
-
-	let labels = await book(ims, detail);
-	
-	if (labels.length > 0) { 
-		
-		for (let label of labels) {
-			await ims.post("shipments/"+ detail.shipmentId + "/attachments", label);
-		}
-
-		let message = new Object();
-		message.time = Date.now();
-		message.source = "DAOTransport";
-		message.messageType = "INFO";
-		message.messageText = "Labels are ready";		
-		message.deviceName = detail.deviceName;
-		message.userId = detail.userId;
-		await ims.post("events/" + detail.eventId + "/messages", message);
-
-	}				
-
-	return "done";
-
-};
-
 exports.bookingHandler = async (event, context) => {
 
     console.info(JSON.stringify(event));

@@ -14,8 +14,11 @@ Metadata:
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 2.0.2
+    SemanticVersion: 2.1.0
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
+Globals:
+  Function:
+    Runtime: nodejs16.x
 Parameters:
   ContextId:
     Type: String
@@ -35,52 +38,11 @@ Parameters:
     Type: String
     MinLength: 4
 Resources:
-  PackingCompletedHandler:
-    Type: AWS::Serverless::Function
-    Properties:
-      Description: Function that runs when a shipping label is requested by Thetis
-        IMS
-      Runtime: nodejs12.x
-      Handler: src/handlers/dao-transport.shippingLabelRequestHandler
-      Environment:
-        Variables:
-          ClientId:
-            Ref: ClientId
-          ClientSecret:
-            Ref: ClientSecret
-          ApiKey:
-            Ref: ApiKey
-      Events:
-        Request:
-          Type: EventBridgeRule
-          Properties:
-            Pattern:
-              source:
-              - public.thetis-ims.com
-              detail-type:
-              - packingCompleted
-              detail:
-                carrierName:
-                - DAO
-                contextId:
-                - Ref: ContextId
-      MemorySize: 128
-      Timeout: 100
-      DeadLetterQueue:
-        Type: SQS
-        TargetArn:
-          Fn::GetAtt:
-          - DeadLetterQueue
-          - Arn
-      CodeUri: PackingCompletedHandler
-    Metadata:
-      SamResourceId: PackingCompletedHandler
   BookingHandler:
     Type: AWS::Serverless::Function
     Properties:
       Description: Function that runs when a transport booking is created in Thetis
         IMS
-      Runtime: nodejs12.x
       Handler: src/handlers/dao-transport.bookingHandler
       Environment:
         Variables:
