@@ -50,6 +50,7 @@ async function getIMS() {
 	
 	var imsAuth = axios.create({
 			baseURL: authUrl,
+			timeout: 15000,
 			headers: { Authorization: "Basic " + base64data, 'Content-Type': "application/x-www-form-urlencoded" },
 			responseType: 'json'
 		});
