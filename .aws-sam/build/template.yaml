@@ -14,7 +14,7 @@ Metadata:
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 2.1.5
+    SemanticVersion: 2.1.6
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
 Globals:
   Function:
