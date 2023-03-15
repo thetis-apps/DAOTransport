@@ -50,7 +50,6 @@ async function getIMS() {
 	
 	var imsAuth = axios.create({
 			baseURL: authUrl,
-			timeout: 15000,
 			headers: { Authorization: "Basic " + base64data, 'Content-Type': "application/x-www-form-urlencoded" },
 			responseType: 'json'
 		});
@@ -82,7 +81,8 @@ async function getDAO() {
 	let daoUrl = "https://api.dao.as/";
     
     var dao = axios.create({
-		baseURL: daoUrl
+		baseURL: daoUrl,
+		timeout: 15000
 	});
 	
 	dao.interceptors.response.use(function(response) {
