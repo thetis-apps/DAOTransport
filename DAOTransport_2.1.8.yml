@@ -14,7 +14,7 @@ Metadata:
     Labels:
     - thetis-ims
     HomePageUrl: https://github.com/thetis-apps/DAOTransport
-    SemanticVersion: 2.1.6
+    SemanticVersion: 2.1.8
     SourceCodeUrl: https://github.com/thetis-apps/DAOTransport
 Globals:
   Function:
@@ -78,7 +78,7 @@ Resources:
           Fn::GetAtt:
           - DeadLetterQueue
           - Arn
-      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/5116910915d37fa8775d3d6dc3b1d33b
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/e9c2d61791c470c741d9c70c8b08db4d
     Metadata:
       SamResourceId: BookingHandler
   InitResource:
@@ -106,7 +106,7 @@ Resources:
             Ref: ClientSecret
           ApiKey:
             Ref: ApiKey
-      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/5116910915d37fa8775d3d6dc3b1d33b
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-1q52gionhjeg3/e9c2d61791c470c741d9c70c8b08db4d
     Metadata:
       SamResourceId: InitializeFunction
   DeadLetterQueue:
@@ -115,37 +115,3 @@ Resources:
       KmsMasterKeyId: alias/aws/sqs
     Metadata:
       SamResourceId: DeadLetterQueue
-  Alarm:
-    Type: AWS::CloudWatch::Alarm
-    Properties:
-      AlarmDescription: Alarm when any message is moved to the dead letter queue.
-      AlarmActions:
-      - Ref: IncidentTopic
-      ComparisonOperator: GreaterThanThreshold
-      EvaluationPeriods: 1
-      MetricName: ApproximateNumberOfMessagesVisible
-      Period: 60
-      Namespace: AWS/SQS
-      Threshold: '0'
-      Unit: Count
-      Dimensions:
-      - Name: QueueName
-        Value:
-          Fn::GetAtt:
-          - DeadLetterQueue
-          - QueueName
-      TreatMissingData: notBreaching
-      Statistic: Maximum
-    Metadata:
-      SamResourceId: Alarm
-  IncidentTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      KmsMasterKeyId: alias/aws/sns
-      Subscription:
-      - Endpoint:
-          Ref: DevOpsEmail
-        Protocol: email
-      DisplayName: Incidents to be handled by Thetis Devops.
-    Metadata:
-      SamResourceId: IncidentTopic
